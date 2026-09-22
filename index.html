@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Torwart Quote</title>
+
+<style>
+:root{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+  color:#142033;
+  background:#f4f6f9;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f4f6f9;
+}
+
+.app{
+  max-width:620px;
+  margin:auto;
+  min-height:100vh;
+  padding:18px 16px 32px;
+}
+
+.card{
+  background:white;
+  border-radius:20px;
+  padding:18px;
+  box-shadow:0 4px 18px #0000000d;
+  margin-bottom:14px;
+}
+
+h1{
+  font-size:28px;
+  margin:4px 0 6px;
+}
+
+.sub{
+  color:#687386;
+  margin:0 0 20px;
+}
+
+label{
+  display:block;
+  font-weight:650;
+  margin:13px 0 7px;
+}
+
+input{
+  width:100%;
+  font-size:17px;
+  padding:13px;
+  border:1px solid #d7dce4;
+  border-radius:12px;
+  background:#fafbfc;
+}
+
+button{
+  border:0;
+  border-radius:15px;
+  padding:16px;
+  font-size:17px;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.primary{
+  width:100%;
+  background:#172235;
+  color:white;
+  margin-top:18px;
+}
+
+.back{
+  background:#e9edf2;
+  color:#172235;
+  width:100%;
+  margin-top:12px;
+}
+
+.hidden{
+  display:none;
+}
+
+.section-title{
+  font-size:16px;
+  font-weight:800;
+  margin-bottom:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:#647084;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:9px;
+}
+
+.save{
+  background:#dff5e7;
+  color:#17643a;
+}
+
+.goal{
+  background:#fde1e1;
+  color:#9c2424;
+}
+
+.miss{
+  background:#e9edf2;
+  color:#334055;
+}
+
+.stat{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:7px 0;
+}
+
+.quote{
+  font-size:38px;
+  font-weight:850;
+}
+
+.small{
+  color:#718096;
+  font-size:14px;
+}
+
+.log{
+  font-size:22px;
+  line-height:1.7;
+  word-break:break-all;
+  min-height:38px;
+}
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%);
+  background:#172235;
+  color:white;
+  padding:10px 15px;
+  border-radius:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<section id="setup" class="card">
+
+<h1>Torwart Quote</h1>
+
+<p class="sub">
+Version 1 · Spiel erfassen
+</p>
+
+<label for="keeper">Torhüter</label>
+<input id="keeper" placeholder="Name des Torhüters">
+
+<label for="opponent">Gegner</label>
+<input id="opponent" placeholder="z. B. VfL Bochum">
+
+<label for="matchday">Spieltag</label>
+<input id="matchday" type="number" min="1" placeholder="z. B. 5">
+
+<label for="date">Datum</label>
+<input id="date" type="date">
+
+<button class="primary" onclick="startGame()">
+Spiel starten
+</button>
+
+</section>
+
+
+<main id="game" class="hidden">
+
+<section class="card">
+
+<div class="small" id="gameInfo"></div>
+
+<div class="stat">
+<span>Torwartquote</span>
+<span class="quote" id="quote">0,0 %</span>
+</div>
+
+<div class="small" id="normalStats">
+0 Würfe · 0 gehalten · 0 Tore · 0 vorbei
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="section-title">
+Letzte Würfe
+</div>
+
+<div class="log" id="normalLog">
+Noch keine Würfe
+</div>
+
+<button class="back" onclick="undo()">
+↩︎ Letzten Eintrag zurücknehmen
+</button>
+
+</section>
+
+
+<section class="card">
+
+<div class="section-title">
+Normaler Wurf
+</div>
+
+<div class="grid">
+
+<button class="save" onclick="add('normal','save')">
+🟢<br>Gehalten
+</button>
+
+<button class="goal" onclick="add('normal','goal')">
+🔴<br>Tor
+</button>
+
+<button class="miss" onclick="add('normal','miss')">
+⚪<br>Vorbei
+</button>
+
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="section-title">
+7-Meter
+</div>
+
+<div class="grid">
+
+<button class="save" onclick="add('seven','save')">
+🟢<br>Gehalten
+</button>
+
+<button class="goal" onclick="add('seven','goal')">
+🔴<br>Tor
+</button>
+
+<button class="miss" onclick="add('seven','miss')">
+⚪<br>Vorbei
+</button>
+
+</div>
+
+<div class="small" style="margin-top:12px" id="sevenStats">
+0 · 0 gehalten · 0 Tore · 0 vorbei
+</div>
+
+</section>
+
+
+<section class="card">
+
+<div class="section-title">
+7-Meter-Quote
+</div>
+
+<div class="stat">
+
+<span>Quote</span>
+
+<span class="quote" id="sevenQuote">
+0,0 %
+</span>
+
+</div>
+
+</section>
+
+
+<button class="primary" onclick="finish()">
+✓ Fertig
+</button>
+
+</main>
+
+</div>
+
+<div id="toast"></div>
+
+
+<script>
+
+let data={
+  normal:[],
+  seven:[]
+};
+
+let game={};
+
+
+const labels={
+  save:'🟢',
+  goal:'🔴',
+  miss:'⚪'
+};
+
+
+document.getElementById('date').valueAsDate=new Date();
+
+
+function startGame(){
+
+  const keeper=
+    document.getElementById('keeper').value.trim();
+
+  const opponent=
+    document.getElementById('opponent').value.trim();
+
+  if(
+    !keeper ||
+    !opponent ||
+    !document.getElementById('date').value
+  ){
+
+    toast('Bitte Torhüter, Gegner und Datum ausfüllen.');
+
+    return;
+  }
+
+
+  game={
+    keeper:keeper,
+    opponent:opponent,
+    matchday:document.getElementById('matchday').value,
+    date:document.getElementById('date').value
+  };
+
+
+  document.getElementById('gameInfo').textContent=
+    `${game.keeper} · ${game.opponent}` +
+    `${game.matchday ? ' · '+game.matchday+'. Spieltag':''}` +
+    ` · ${new Date(game.date+'T12:00').toLocaleDateString('de-DE')}`;
+
+
+  document
+    .getElementById('setup')
+    .classList.add('hidden');
+
+  document
+    .getElementById('game')
+    .classList.remove('hidden');
+
+
+  render();
+}
+
+
+function add(type,result){
+
+  data[type].push(result);
+
+  render();
+}
+
+
+function undo(){
+
+  if(data.seven.length){
+
+    data.seven.pop();
+
+  }else if(data.normal.length){
+
+    data.normal.pop();
+
+  }else{
+
+    toast('Noch nichts zum Zurücknehmen.');
+
+    return;
+  }
+
+  render();
+}
+
+
+function calc(a){
+
+  const held=
+    a.filter(x=>x==='save').length;
+
+  const goal=
+    a.filter(x=>x==='goal').length;
+
+  const miss=
+    a.filter(x=>x==='miss').length;
+
+  return{
+    held:held,
+    goal:goal,
+    miss:miss,
+    total:a.length,
+    quote:(held+goal)
+      ? held/(held+goal)*100
+      : 0
+  };
+}
+
+
+function render(){
+
+  const n=calc(data.normal);
+  const s=calc(data.seven);
+
+
+  document.getElementById('quote').textContent=
+    n.quote.toFixed(1).replace('.',',')+' %';
+
+
+  document.getElementById('normalStats').textContent=
+    `${n.total} Würfe · ${n.held} gehalten · ${n.goal} Tore · ${n.miss} vorbei`;
+
+
+  document.getElementById('normalLog').textContent=
+    n.total
+      ? data.normal.map(x=>labels[x]).join(' ')
+      : 'Noch keine Würfe';
+
+
+  document.getElementById('sevenStats').textContent=
+    `${s.total} · ${s.held} gehalten · ${s.goal} Tore · ${s.miss} vorbei`;
+
+
+  document.getElementById('sevenQuote').textContent=
+    s.quote.toFixed(1).replace('.',',')+' %';
+}
+
+
+function finish(){
+
+  const n=calc(data.normal);
+  const s=calc(data.seven);
+
+  toast(
+    `Spiel beendet · Quote ${
+      n.quote.toFixed(1).replace('.',',')
+    } % · 7 m ${
+      s.quote.toFixed(1).replace('.',',')
+    } %`
+  );
+}
+
+
+function toast(t){
+
+  const el=document.getElementById('toast');
+
+  el.textContent=t;
+
+  el.style.opacity=1;
+
+  clearTimeout(window.tt);
+
+  window.tt=setTimeout(
+    ()=>el.style.opacity=0,
+    2400
+  );
+}
+
+</script>
+
+</body>
+</html>
