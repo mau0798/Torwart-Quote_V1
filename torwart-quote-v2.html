@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Torwart Quote</title>
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--blue:#2563eb;--green:#16a34a;--red:#dc2626;--orange:#ea580c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{border:0;border-radius:14px;padding:14px 16px;font-weight:700;cursor:pointer}input,select{width:100%;padding:14px;border:1px solid #d1d5db;border-radius:12px;background:#fff}
+.app{max-width:760px;margin:auto;padding:18px 14px 40px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.brand{font-size:25px;font-weight:900}.sub{color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #00000008}.title{font-size:18px;font-weight:800;margin-bottom:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+.primary{background:var(--blue);color:#fff}.secondary{background:#e5e7eb;color:#111827}.success{background:#dcfce7;color:#166534}.danger{background:#fee2e2;color:#991b1b}.dark{background:#111827;color:#fff}.orange{background:#ffedd5;color:#9a3412}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f9fafb;border-radius:13px;padding:11px;text-align:center}.num{font-size:20px;font-weight:900}.small{font-size:12px;color:var(--muted)}
+.hidden{display:none!important}.keeperBtns{display:flex;gap:8px;overflow:auto}.keeperBtns button{white-space:nowrap;background:#e5e7eb}.keeperBtns button.active{background:var(--blue);color:white}
+.time{font-size:34px;font-weight:900;text-align:center;letter-spacing:1px}.shotType button,.result button{min-height:52px}.selected{outline:3px solid #93c5fd;background:#dbeafe!important}
+.listitem{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.listitem:last-child{border-bottom:0}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:20}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast" class="toast"></div>
+<script>
+const KEY="torwartQuoteV2";
+let db=JSON.parse(localStorage.getItem(KEY)||'{"seasons":{},"activeGame":null}');
+let state={screen:"home",selectedSeason:"2026/27",game:null,shotType:null,result:null};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function toast(s){let x=document.getElementById("toast");x.textContent=s;x.style.display="block";setTimeout(()=>x.style.display="none",1600)}
+function sec(s){let [m,x]=String(s).split(":").map(Number);return m*60+x}
+function fmt(n){n=Math.max(0,Math.round(n||0));return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0")}
+function pct(h,g){let d=h+g;return d?((h/d)*100).toFixed(1)+" %":"–"}
+function season(){return db.seasons[state.selectedSeason] ||= {games:[]}}
+function aggregate(games){
+ let a={shots:0,held:0,goals:0,missed:0,seven:0,sevenHeld:0,sevenGoals:0};
+ games.forEach(g=>g.keepers.forEach(k=>{
+   ["normal","seven"].forEach(type=>k[type].forEach(x=>{
+     if(type==="normal"){a.shots++; if(x==="held")a.held++; if(x==="goal")a.goals++; if(x==="missed")a.missed++}
+     else {a.seven++; if(x==="held")a.sevenHeld++; if(x==="goal")a.sevenGoals++}
+   }))
+ })); return a;
+}
+function render(){document.getElementById("app").innerHTML=state.screen==="home"?home():state.screen==="new"?newGame():state.screen==="game"?game():state.screen==="past"?past():summary(state.game)}
+function home(){
+ let a=aggregate(season().games), active=db.activeGame;
+ return `<div class="app"><div class="top"><div><div class="brand">🥅 Torwart Quote</div><div class="sub">Handball-Torwartstatistik</div></div></div>
+ ${active?`<div class="card" style="border-color:#93c5fd"><div class="title">⏯ Unfertiges Spiel</div><div>${esc(active.opponent)} · ${esc(active.season)} · ${fmt(active.currentTimeSec)}</div><div class="small">Aktiv: ${esc(active.keepers[active.activeKeeperId]?.name||"–")}</div><button class="primary" style="width:100%;margin-top:10px" onclick="resume()">Spiel fortsetzen</button></div>`:""}
+ <div class="card"><div class="title">Saison</div><div class="row"><select id="seasonSel" onchange="state.selectedSeason=this.value;render()">${Object.keys(db.seasons).length?Object.keys(db.seasons).map(s=>`<option ${s===state.selectedSeason?"selected":""}>${esc(s)}</option>`).join(""):`<option>2026/27</option>`}</select><button class="secondary" onclick="newSeason()">Neue Saison</button></div></div>
+ <div class="card"><div class="title">Saisonübersicht ${esc(state.selectedSeason)}</div><div class="statgrid">
+ <div class="stat"><div class="num">${season().games.length}</div><div class="small">Spiele</div></div><div class="stat"><div class="num">${a.shots}</div><div class="small">Würfe</div></div><div class="stat"><div class="num">${pct(a.held,a.goals)}</div><div class="small">Quote</div></div>
+ <div class="stat"><div class="num">${a.held}</div><div class="small">Paraden</div></div><div class="stat"><div class="num">${a.goals}</div><div class="small">Gegentore</div></div><div class="stat"><div class="num">${pct(a.sevenHeld,a.sevenGoals)}</div><div class="small">7-m-Quote</div></div></div></div>
+ <button class="primary" style="width:100%;margin:6px 0" onclick="state.screen='new';render()">＋ Neues Spiel</button>
+ <button class="secondary" style="width:100%" onclick="state.screen='past';render()">Vergangene Spiele</button></div>`;
+}
+function newSeason(){let n=prompt("Name der Saison, z. B. 2026/27");if(!n)return;db.seasons[n] ||= {games:[]};state.selectedSeason=n;save();render()}
+function newGame(){
+ return `<div class="app"><div class="top"><div><div class="brand">Neues Spiel</div><div class="sub">${esc(state.selectedSeason)}</div></div><button class="secondary" onclick="state.screen='home';render()">Zurück</button></div>
+ <div class="card"><label class="label">Gegner</label><input id="opponent" placeholder="z. B. TV Beispiel"><label class="label">Spieltag</label><input id="matchday" placeholder="z. B. 3. Spieltag"><label class="label">Datum</label><input id="date" type="date" value="${new Date().toISOString().slice(0,10)}"><label class="label">Torhüter</label><div id="keeperInputs"><input class="keeperInput" placeholder="Torhüter 1"><input class="keeperInput" placeholder="Torhüter 2" style="margin-top:8px"></div><button class="secondary" style="margin-top:8px" onclick="addKeeperInput()">＋ Torhüter hinzufügen</button></div>
+ <button class="primary" style="width:100%" onclick="startGame()">Spiel starten</button></div>`;
+}
+function addKeeperInput(){let d=document.getElementById("keeperInputs");let i=document.createElement("input");i.className="keeperInput";i.placeholder="Torhüter";i.style.marginTop="8px";d.appendChild(i)}
+function startGame(){
+ let names=[...document.querySelectorAll(".keeperInput")].map(x=>x.value.trim()).filter(Boolean);if(!names.length){toast("Bitte mindestens einen Torhüter eingeben");return}
+ let keepers={};names.forEach((n,i)=>keepers["k"+i]={id:"k"+i,name:n,normal:[],seven:[],own:[],segments:[{start:0,end:null}]});
+ state.game={id:Date.now(),season:state.selectedSeason,opponent:document.getElementById("opponent").value.trim()||"Unbekannt",matchday:document.getElementById("matchday").value.trim(),date:document.getElementById("date").value, currentTimeSec:0,activeKeeperId:"k0",keepers,paused:false,events:[]};
+ db.activeGame=state.game;save();state.screen="game";render();
+}
+function resume(){state.game=db.activeGame;state.screen="game";render()}
+function game(){
+ let g=state.game,k=g.keepers[g.activeKeeperId];
+ return `<div class="app"><div class="top"><div><div class="brand">Laufendes Spiel</div><div class="sub">${esc(g.opponent)} · ${esc(g.matchday)}</div></div></div>
+ <div class="card"><div class="small" style="text-align:center">Offizielle Spielzeit</div><div class="time">${fmt(g.currentTimeSec)}</div>
+ <div class="row"><input id="timeInput" value="${fmt(g.currentTimeSec)}" placeholder="MM:SS"><button class="primary" onclick="setTime()">Zeit übernehmen</button></div>
+ <div class="small" style="margin-top:8px">Die Uhr läuft bewusst nicht automatisch.</div></div>
+ <div class="card"><div class="title">Aktiver Torhüter</div><div class="keeperBtns">${Object.values(g.keepers).map(x=>`<button class="${x.id===g.activeKeeperId?"active":""}" onclick="selectKeeper('${x.id}')">${esc(x.name)}</button>`).join("")}</div>
+ <button class="orange" style="width:100%;margin-top:10px" onclick="substitution()">🔄 Torhüterwechsel</button></div>
+ <div class="card"><div class="title">Wurf erfassen</div><div class="small">1. Wurfart wählen</div><div class="grid shotType" style="margin-top:7px">${[["6m","6 m"],["9m","9 m"],["circle","Kreis"],["counter","Gegenstoß"],["other","Sonstiger"]].map(x=>`<button class="${state.shotType===x[0]?"selected":""}" onclick="state.shotType='${x[0]}';render()">${x[1]}</button>`).join("")}</div>
+ <div class="small" style="margin-top:12px">2. Ergebnis</div><div class="grid3 result" style="margin-top:7px"><button class="success" onclick="shot('held')">🧤 Parade</button><button class="danger" onclick="shot('goal')">❌ Tor</button><button class="secondary" onclick="shot('missed')">➖ Vorbei</button></div></div>
+ <div class="card"><div class="title">7-Meter</div><div class="grid3"><button class="success" onclick="seven('held')">🧤 Parade</button><button class="danger" onclick="seven('goal')">❌ Tor</button><button class="secondary" onclick="seven('missed')">➖ Vorbei</button></div></div>
+ <div class="card"><div class="title">Eigene Torwartaktionen</div><div class="grid"><button class="success" onclick="own('goal')">⚽ Torwarttor</button><button class="danger" onclick="own('error')">⚠️ Technischer Fehler</button></div></div>
+ <div class="card"><div class="title">${esc(k.name)}</div><div class="statgrid"><div class="stat"><div class="num">${k.normal.filter(x=>x==="held").length}</div><div class="small">Paraden</div></div><div class="stat"><div class="num">${k.normal.filter(x=>x==="goal").length}</div><div class="small">Gegentore</div></div><div class="stat"><div class="num">${pct(k.normal.filter(x=>x==="held").length,k.normal.filter(x=>x==="goal").length)}</div><div class="small">Quote</div></div></div></div>
+ <div class="row"><button class="secondary" onclick="pauseGame()">⏸ Pause</button><button class="dark" onclick="finishGame()">✓ Spiel beenden</button></div></div>`;
+}
+function persist(){db.activeGame=state.game;save()}
+function setTime(){
+ let v=document.getElementById("timeInput").value.trim();if(!/^\d{1,2}:[0-5]\d$/.test(v)){toast("Zeit bitte als MM:SS eingeben");return}
+ let n=sec(v);if(n<state.game.currentTimeSec||n>3600){toast("Zeit muss zwischen aktueller Zeit und 60:00 liegen");return}
+ state.game.currentTimeSec=n;persist();render();toast("Spielzeit gespeichert")}
+function selectKeeper(id){state.game.activeKeeperId=id;persist();render()}
+function substitution(){
+ let g=state.game,v=prompt("Wechselzeit eingeben (MM:SS)",fmt(g.currentTimeSec));if(v===null)return;
+ if(!/^\d{1,2}:[0-5]\d$/.test(v)){toast("Ungültige Zeit");return}let t=sec(v);if(t<g.currentTimeSec||t>3600){toast("Zeit muss nach der aktuellen Zeit liegen");return}
+ let ids=Object.keys(g.keepers),labels=ids.map((id,i)=>(i+1)+": "+g.keepers[id].name).join("\n");let choice=prompt("Neuer Torhüter:\n"+labels);if(choice===null)return;let idx=Number(choice)-1;if(!ids[idx]){toast("Ungültige Auswahl");return}
+ let old=g.keepers[g.activeKeeperId];let last=old.segments[old.segments.length-1];last.end=t;
+ g.keepers[ids[idx]].segments.push({start:t,end:null});g.activeKeeperId=ids[idx];g.currentTimeSec=t;persist();render();toast("Torhüterwechsel gespeichert")}
+function shot(r){if(!state.shotType){toast("Bitte zuerst die Wurfart wählen");return}state.game.keepers[state.game.activeKeeperId].normal.push(r);state.game.events.push({time:state.game.currentTimeSec,type:"shot",shotType:state.shotType,result:r,keeper:state.game.activeKeeperId});persist();state.shotType=null;render()}
+function seven(r){state.game.keepers[state.game.activeKeeperId].seven.push(r);state.game.events.push({time:state.game.currentTimeSec,type:"seven",result:r,keeper:state.game.activeKeeperId});persist();render()}
+function own(r){state.game.keepers[state.game.activeKeeperId].own.push(r);state.game.events.push({time:state.game.currentTimeSec,type:"own",result:r,keeper:state.game.activeKeeperId});persist();render()}
+function pauseGame(){state.game.paused=true;persist();state.screen="home";render();toast("Spiel gespeichert")}
+function finishGame(){
+ let g=state.game,v=prompt("Endgültige Spielzeit (MM:SS)",fmt(g.currentTimeSec));if(v===null)return;if(!/^\d{1,2}:[0-5]\d$/.test(v)){toast("Ungültige Zeit");return}let t=sec(v);if(t<g.currentTimeSec||t>3600){toast("Endzeit muss >= aktueller Zeit und <= 60:00 sein");return}
+ let k=g.keepers[g.activeKeeperId],last=k.segments[k.segments.length-1];last.end=t;g.currentTimeSec=t;g.paused=false;db.seasons[g.season].games.unshift(g);db.activeGame=null;save();state.game=g;state.screen="summary";render()}
+function playtime(k){return k.segments.reduce((a,s)=>a+(s.end==null?0:s.end-s.start),0)}
+function summary(g){
+ return `<div class="app"><div class="top"><div><div class="brand">Spiel beendet</div><div class="sub">${esc(g.opponent)} · ${esc(g.date)}</div></div></div>
+ <div class="card"><div class="title">Spielübersicht</div><div class="statgrid"><div class="stat"><div class="num">${fmt(g.currentTimeSec)}</div><div class="small">Spielzeit</div></div><div class="stat"><div class="num">${Object.keys(g.keepers).length}</div><div class="small">Torhüter</div></div><div class="stat"><div class="num">${g.events.length}</div><div class="small">Aktionen</div></div></div></div>
+ ${Object.values(g.keepers).map(k=>keeperSummary(k)).join("")}
+ <div class="grid"><button class="secondary" onclick="state.screen='past';render()">Vergangene Spiele</button><button class="primary" onclick="state.screen='new';render()">Neues Spiel</button></div>
+ <button class="dark" style="width:100%;margin-top:8px" onclick="state.screen='home';render()">Saisonübersicht</button></div>`;
+}
+function keeperSummary(k){
+ let h=k.normal.filter(x=>x==="held").length,go=k.normal.filter(x=>x==="goal").length,sv=k.seven.filter(x=>x==="held").length,sg=k.seven.filter(x=>x==="goal").length;
+ let ownGoal=k.own.filter(x=>x==="goal").length,err=k.own.filter(x=>x==="error").length;
+ let by={};["6m","9m","circle","counter","other"].forEach(t=>{let a=state.game.events.filter(e=>e.keeper===k.id&&e.type==="shot"&&e.shotType===t);let ph=a.filter(x=>x.result==="held").length,pg=a.filter(x=>x.result==="goal").length;by[t]=[ph,pg]});
+ return `<div class="card"><div class="title">${esc(k.name)}</div><div class="small">Spielzeit: <b>${fmt(playtime(k))}</b></div><div class="statgrid" style="margin-top:10px"><div class="stat"><div class="num">${h}</div><div class="small">Paraden</div></div><div class="stat"><div class="num">${go}</div><div class="small">Gegentore</div></div><div class="stat"><div class="num">${pct(h,go)}</div><div class="small">Quote</div></div><div class="stat"><div class="num">${sv}/${sg}</div><div class="small">7 m</div></div><div class="stat"><div class="num">${ownGoal}</div><div class="small">Torwarttore</div></div><div class="stat"><div class="num">${err}</div><div class="small">Fehler</div></div></div>
+ <table style="margin-top:12px"><tr><th>Wurfart</th><th>Paraden</th><th>Tore</th><th>Quote</th></tr>${[["6m","6 m"],["9m","9 m"],["circle","Kreis"],["counter","Gegenstoß"],["other","Sonstiger"]].map(x=>`<tr><td>${x[1]}</td><td>${by[x[0]][0]}</td><td>${by[x[0]][1]}</td><td>${pct(by[x[0]][0],by[x[0]][1])}</td></tr>`).join("")}</table></div>`;
+}
+function past(){
+ let games=season().games;return `<div class="app"><div class="top"><div><div class="brand">Vergangene Spiele</div><div class="sub">${esc(state.selectedSeason)}</div></div><button class="secondary" onclick="state.screen='home';render()">Zurück</button></div>
+ <div class="card">${games.length?games.map((g,i)=>{let a=aggregate([g]);return `<div class="listitem"><div><b>${esc(g.opponent)}</b><div class="small">${esc(g.date)} · ${esc(g.matchday)} · ${pct(a.held,a.goals)}</div></div><button class="secondary" onclick="state.game=season().games[${i}];state.screen='summary';render()">Öffnen</button></div>`}).join(""):`<div class="small">Noch keine Spiele gespeichert.</div>`}</div></div>`;
+}
+if(!db.seasons[state.selectedSeason]){db.seasons[state.selectedSeason]={games:[]};save()}
+render();
+</script>
+</body>
+</html>
