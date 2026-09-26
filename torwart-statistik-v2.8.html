@@ -1,0 +1,211 @@
+<!doctype html><html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1769aa"><title>Torwart Statistik</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--text:#172033;--muted:#6b7280;--line:#dfe4ea;--p:#1769aa;--soft:#eaf3fb;--danger:#c62828;--ok:#16834b;--warn:#a86400}
+body.dark{--bg:#0f141b;--card:#18212c;--text:#f2f5f8;--muted:#aab5c2;--line:#2b3745;--p:#4da3e6;--soft:#203447;--danger:#ff6b6b;--ok:#42c982;--warn:#f0b45b}
+*{box-sizing:border-box}button,input,select{touch-action:manipulation}input,select{min-width:0;max-width:100%;display:block}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:720px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 14px 28px}header{display:flex;justify-content:space-between;align-items:center;padding:17px 3px}.logo{font-size:23px;font-weight:800}
+.theme,.btn,input,select{font:inherit}.theme{padding:9px 12px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--text)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin:10px 0}h1,h2,h3{margin:0 0 12px}.muted{color:var(--muted)}.small{font-size:13px}
+label{display:block;font-size:13px;color:var(--muted);margin:11px 0 5px}input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text)}
+.btn{width:100%;padding:14px;border:0;border-radius:13px;background:var(--p);color:#fff;font-weight:700;margin-top:9px}.secondary{background:var(--soft);color:var(--p)}.danger{background:var(--danger);color:#fff}.nav,.grid2,.grid3,.actions,.filters{display:grid;gap:8px}.nav{grid-template-columns:1fr 1fr;margin:8px 0 14px}.grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid2>*{min-width:0;overflow:hidden}.grid2 input,.grid2 select{width:100%;min-width:0;max-width:100%;display:block}.grid2 input[type="date"]{-webkit-appearance:none;appearance:none}.grid3{grid-template-columns:repeat(3,1fr)}.actions{grid-template-columns:1fr 1fr;margin-top:15px}
+.equal-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.equal-fields>*{min-width:0;width:100%}.equal-fields input{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box}.equal-fields input[type="date"]{-webkit-appearance:none;appearance:none}.flash{min-height:25px;text-align:center;font-size:14px;font-weight:700;color:var(--ok);padding:3px 0}.undo{background:var(--soft);color:var(--p);border:1px solid var(--line)}.team-row{display:flex;gap:8px;align-items:stretch}.team-row select{flex:1;min-width:0}.mini-btn{width:48px;flex:0 0 48px}.match-title{font-size:22px;font-weight:850;line-height:1.25;margin:2px 0 7px}.match-sub{color:var(--muted);font-size:14px}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--card);color:var(--text);border:1px solid var(--line);box-shadow:0 8px 30px #0005;border-radius:999px;padding:12px 18px;font-weight:800;text-align:center;white-space:nowrap;z-index:30;opacity:0;pointer-events:none;transition:opacity .18s}.toast.show{opacity:1}.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;border-radius:14px;background:var(--soft)}.stat b{display:block;font-size:22px;margin-top:3px}.time{text-align:center;font-size:42px;font-weight:800;padding:5px}
+.pill{display:inline-block;background:var(--soft);color:var(--p);border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}.section{display:flex;justify-content:space-between;align-items:center}
+.keeper{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.keeper input{flex:1}.minus{width:43px;border:0;border-radius:12px;background:var(--soft);color:var(--danger);font-weight:800}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.shots button{border:0;border-radius:13px;padding:15px 5px;color:#fff;font-weight:800}.held{background:var(--ok)}.goal{background:var(--danger)}.miss{background:var(--warn)}
+.type{background:var(--soft);color:var(--text);border:1px solid var(--line)}.type.active{background:var(--p);color:#fff}
+.item{padding:13px 0;border-bottom:1px solid var(--line)}.detail-list{display:grid;gap:7px;margin-top:10px}.detail-row{display:flex;justify-content:space-between;gap:12px;padding:10px 11px;border-radius:11px;background:var(--soft)}.detail-row b{white-space:nowrap}.detail-row span{color:var(--muted);text-align:right}.detail-title{margin:15px 0 8px;font-size:14px;font-weight:800}.empty{text-align:center;padding:28px;color:var(--muted)}
+.overlay{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-start;justify-content:center;padding:calc(12px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom));z-index:100;overflow:hidden}.overlay.hidden{display:none}.modal{width:min(680px,100%);height:min(calc(100dvh - 24px),760px);max-height:calc(100dvh - 24px);overflow:hidden;background:var(--card);border-radius:22px;padding:0;position:relative;display:flex;flex-direction:column}.modal-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:24px 20px calc(28px + env(safe-area-inset-bottom))}.modal-x{position:absolute;right:14px;top:12px;width:38px;height:38px;border:0;border-radius:50%;background:var(--soft);color:var(--text);font-size:22px;font-weight:700}.modal p{color:var(--muted);line-height:1.45}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.quick button{padding:10px;border:0;border-radius:11px;background:var(--soft);color:var(--text)}
+@media(max-width:420px){.grid3{grid-template-columns:1fr 1fr}.time{font-size:38px}.quick{grid-template-columns:repeat(3,1fr)}}
+</style></head><body><div class="app"><header><div class="logo">🧤 Torwart Statistik</div><button class="theme" id="theme" onclick="dark()">🌙</button></header><main id="app"></main></div>
+<div id="overlay" class="overlay hidden"><div id="modal" class="modal"></div></div>
+<script>
+const KEY="torwartQuoteV21";let db=load(),S={screen:"home",season:"2026/27",game:null,type:"6m",filters:{v:"alle",o:"alle",k:"alle"}};
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{seasons:{},activeGame:null}}catch(e){return{seasons:{},activeGame:null}}}
+db.clubs=db.clubs||[];db.opponents=db.opponents||[];
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}function sea(){return db.seasons[S.season]||(db.seasons[S.season]={games:[]})}
+function esc(x){return String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function F(x){x=Math.max(0,Math.min(3600,+x||0));return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
+function P(h,g){return h+g?Math.round(h/(h+g)*100):0}function detailStats(g,k){
+  const types=["6m","9m","Kreis","Gegenstoß","Sonstiger"];
+  const rows=types.map(t=>{
+    const a=(g.events||[]).filter(e=>e.type=="shot"&&e.keeper==k.id&&e.shotType==t);
+    const h=a.filter(e=>e.result=="held").length;
+    return {label:t,h,total:a.length};
+  });
+  const seven=(g.events||[]).filter(e=>e.type=="seven"&&e.keeper==k.id);
+  rows.push({label:"7m",h:seven.filter(e=>e.result=="held").length,total:seven.length});
+  return rows;
+}
+function detailHtml(g,k){
+  return detailStats(g,k).map(r=>`<div class="detail-row"><b>Gehaltene ${esc(r.label)}-Würfe</b><span>${r.h}/${r.total} gehalten</span></div>`).join("");
+}
+function G(){return S.game||db.activeGame}
+function K(g){return g.keepers[g.activeKeeperId]}function st(k){let n=k.normal||[],s=k.seven||[],o=k.own||[];return{h:n.filter(x=>x=="held").length,g:n.filter(x=>x=="goal").length,m:n.filter(x=>x=="missed").length,sh:s.filter(x=>x=="held").length,sg:s.filter(x=>x=="goal").length,sm:s.filter(x=>x=="missed").length,ownGoal:o.filter(x=>x=="goal").length,er:o.filter(x=>x=="error").length}}
+function PT(k){return(k.segments||[]).reduce((a,x)=>a+Math.max(0,(x.end??x.start)-x.start),0)}function persist(){db.activeGame=S.game;save()}
+function dark(){document.body.classList.toggle("dark");localStorage.setItem("tqDark",document.body.classList.contains("dark")?"1":"0");theme()}function theme(){document.getElementById("theme").textContent=document.body.classList.contains("dark")?"☀️":"🌙"}
+function render(){theme();let r=document.getElementById("app");r.innerHTML={home,setup,game,past,summary,season}[S.screen]()}
+function home(){return`<div class="card"><h1>Torwart Statistik</h1><p class="muted">Handball-Torwartstatistik auf dem iPhone.</p><label>Saison</label><input value="${esc(S.season)}" onchange="S.season=this.value.trim()||'2026/27';sea();save()"><button class="btn" onclick="newGame()">➕ Neues Spiel</button><div class="grid2"><button class="btn secondary" onclick="S.screen='past';render()">📋 Vergangene Spiele</button><button class="btn secondary" onclick="S.screen='season';render()">📊 Saisonübersicht</button></div></div>${db.activeGame?`<div class="card"><div class="section"><h3>Aktuelles Spiel</h3><span class="pill">offen</span></div><p>${matchTitle(db.activeGame)}<br><span class="small">${F(db.activeGame.currentTimeSec)}</span></p><button class="btn" onclick="resume()">▶️ Fortsetzen</button></div>`:`<div class="card"><p class="muted">Kein unvollendetes Spiel gespeichert.</p></div>`}`}
+function newGame(){S.screen="setup";S.game=null;render()}function names(){let n={};document.querySelectorAll("input[data-k]").forEach(x=>n[x.dataset.k]=x.value.trim()||"Torwart");return n}
+
+function ensureLists(){db.clubs=db.clubs||[];db.opponents=db.opponents||[]}
+function syncSetup(){
+ const g=S.game||{};
+ g.season=document.getElementById("ss")?.value.trim()||g.season||S.season||"2026/27";
+ g.club=document.getElementById("clubSel")?.value||g.club||"";
+ g.opponent=document.getElementById("oppSel")?.value||g.opponent||"";
+ g.matchday=document.getElementById("mm")?.value||g.matchday||"";
+ g.date=document.getElementById("dd")?.value||g.date||new Date().toISOString().slice(0,10);
+ g.venue=document.getElementById("vv")?.value||g.venue||"heim";
+ S.game=g;S.season=g.season;
+}
+function clubChanged(v){syncSetup();S.game.club=v;if(v)localStorage.setItem("tqLastClub",v);ensureLists();if(v&&!db.clubs.includes(v))db.clubs.push(v);save();render()}
+function oppChanged(v){syncSetup();S.game.opponent=v;ensureLists();if(v&&!db.opponents.includes(v))db.opponents.push(v);save();render()}
+function newClub(){syncSetup();let v=prompt("Name des Vereins:");if(!v)return;v=v.trim();if(!v)return;ensureLists();if(!db.clubs.includes(v))db.clubs.push(v);S.game.club=v;localStorage.setItem("tqLastClub",v);save();render()}
+function newOpponent(){syncSetup();let v=prompt("Name des Gegners:");if(!v)return;v=v.trim();if(!v)return;ensureLists();if(!db.opponents.includes(v))db.opponents.push(v);S.game.opponent=v;save();render()}
+function setKeeper(id,name){S.game=S.game||{};S.game.keepers=S.game.keepers||{};if(!S.game.keepers[id])S.game.keepers[id]={id,name,normal:[],seven:[],own:[],segments:[]};S.game.keepers[id].name=name;save()}
+function matchTitle(g){const club=g.club||"Mein Verein",opp=g.opponent||"Gegner";return g.venue==="auswärts"?`✈️ ${esc(opp)} vs. ${esc(club)}`:`🏠 ${esc(club)} vs. ${esc(opp)}`}
+
+function setup(){
+ ensureLists();const g=S.game||{},keep=Object.values(g.keepers||{});
+ const club=g.club||localStorage.getItem("tqLastClub")||"",opp=g.opponent||"";
+ const clubs=db.clubs.map(x=>`<option value="${esc(x)}" ${x===club?"selected":""}>${esc(x)}</option>`).join("");
+ const opponents=db.opponents.map(x=>`<option value="${esc(x)}" ${x===opp?"selected":""}>${esc(x)}</option>`).join("");
+ const keeperRows=(keep.length?keep:[{id:"k0",name:"Torwart 1"}]).map(k=>`<div class="keeper"><input data-k="${esc(k.id)}" value="${esc(k.name)}" oninput="setKeeper('${k.id}',this.value)"><button class="minus" onclick="rem('${k.id}')">−</button></div>`).join("");
+ return `<div class="nav"><button class="btn secondary" onclick="S.screen='home';render()">← Start</button></div>
+ <div class="card"><h2>Neues Spiel</h2><label>Saison</label><input id="ss" value="${esc(g.season||S.season||"2026/27")}">
+ <label>Mein Verein</label><div class="team-row"><select id="clubSel" onchange="clubChanged(this.value)"><option value="">Verein auswählen</option>${clubs}</select><button class="btn secondary mini-btn" onclick="newClub()">＋</button></div>
+ <label>Gegner</label><div class="team-row"><select id="oppSel" onchange="oppChanged(this.value)"><option value="">Gegner auswählen</option>${opponents}</select><button class="btn secondary mini-btn" onclick="newOpponent()">＋</button></div>
+ <div class="grid2"><div><label>Spieltag</label><input id="mm" inputmode="numeric" value="${esc(g.matchday||"")}"></div><div><label>Datum</label><input id="dd" type="date" value="${esc(g.date||new Date().toISOString().slice(0,10))}"></div></div>
+ <label>Spielort</label><select id="vv"><option value="heim" ${g.venue!=="auswärts"?"selected":""}>🏠 Heim</option><option value="auswärts" ${g.venue==="auswärts"?"selected":""}>✈️ Auswärts</option></select>
+ <label>Torhüter</label>${keeperRows}<button class="btn secondary" onclick="add()">＋ Torwart hinzufügen</button><button class="btn" onclick="start()">Spiel starten</button></div>`;
+}
+
+function add(){syncSetup();const current=Object.values(S.game.keepers||{}),keepers={};current.forEach(k=>keepers[k.id]=k);const id="k"+Date.now();keepers[id]={id,name:"Torwart "+(current.length+1),normal:[],seven:[],own:[],segments:[]};S.game.keepers=keepers;render()}
+function rem(id){syncSetup();const ids=Object.keys(S.game.keepers||{});if(ids.length<2)return alert("Mindestens ein Torwart muss vorhanden sein.");delete S.game.keepers[id];render()}
+function start(){
+  syncSetup();
+  ensureLists();
+  let n=names(),ids=Object.keys(n),g=S.game||{};
+  g.season=document.getElementById("ss")?.value.trim()||S.season||"2026/27";
+  g.club=document.getElementById("clubSel")?.value.trim()||g.club||"";
+  g.opponent=document.getElementById("oppSel")?.value.trim()||g.opponent||"";
+  if(!g.club){alert("Bitte den Verein auswählen, bevor das Spiel gestartet wird.");document.getElementById("clubSel")?.focus();return;}
+  if(!g.opponent){alert("Bitte den Gegner auswählen, bevor das Spiel gestartet wird.");document.getElementById("oppSel")?.focus();return;}
+  g.matchday=document.getElementById("mm")?.value.trim()||"";
+  g.date=document.getElementById("dd")?.value||new Date().toISOString().slice(0,10);
+  g.venue=document.getElementById("vv")?.value||"heim";
+  g.id="g"+Date.now();
+  g.currentTimeSec=0;
+  g.activeKeeperId=ids[0];
+  g.paused=false;
+  g.events=[];
+  g.keepers={};
+  ids.forEach(i=>g.keepers[i]={id:i,name:n[i],normal:[],seven:[],own:[],segments:[]});
+  g.keepers[ids[0]].segments.push({start:0,end:null});
+  S.game=g;
+  db.activeGame=g;
+  S.season=g.season;
+  save();
+  S.screen="game";
+  render();
+}
+function resume(){S.game=db.activeGame;S.screen="game";render()}
+function game(){let g=G(),k=K(g),s=st(k);return`<div class="nav"><button class="btn secondary" onclick="S.screen='home';render()">← Start</button><button class="btn secondary" onclick="finishModal()">🏁 Beenden</button></div><div class="card"><div class="section"><div><h2>${matchTitle(g)}</h2><span class="pill">${g.venue=="heim"?"🏠 Heim":"✈️ Auswärts"}</span></div><b>${esc(k.name)}</b></div><div class="time">${F(g.currentTimeSec)}</div><div id="flash" class="flash" aria-live="polite"></div><button class="btn secondary" onclick="timeModal()">⏱️ Spielzeit ändern</button><div class="grid2"><button class="btn secondary" onclick="keeperModal()">🔄 Torwartwechsel</button><button class="btn secondary" onclick="pause()">${g.paused?"▶️ Fortsetzen":"⏸️ Pause"}</button></div><button class="btn undo" onclick="undo()">↩️ Letzte Eingabe rückgängig</button></div><div class="card"><div class="section"><h3>Schussart</h3><span class="pill">${S.type}</span></div><div class="grid3">${["6m","9m","Kreis","Gegenstoß","Sonstiger"].map(t=>`<button class="btn type ${S.type==t?"active":""}" onclick="S.type='${t}';render()">${t}</button>`).join("")}</div><h3 style="margin-top:17px">Wurf</h3><div class="shots"><button class="held" onclick="shot('held')">Gehalten</button><button class="goal" onclick="shot('goal')">Tor</button><button class="miss" onclick="shot('missed')">Daneben</button></div></div><div class="card"><h3>7-Meter</h3><div class="shots"><button class="held" onclick="seven('held')">Gehalten</button><button class="goal" onclick="seven('goal')">Tor</button><button class="miss" onclick="seven('missed')">Daneben</button></div></div><div class="card"><h3>Torwart-Aktion</h3><div class="grid2"><button class="btn secondary" onclick="own('goal')">⚽ Tor</button><button class="btn secondary" onclick="own('error')">⚠️ Technischer Fehler</button></div></div><div class="card"><h3>Aktueller Torwart</h3><div class="statgrid"><div class="stat">Quote<b>${P(s.h,s.g)}%</b><span class="small">${s.h} gehalten · ${s.g} Tore</span></div><div class="stat">Spielzeit<b>${F(PT(k))}</b></div><div class="stat">7m Quote<b>${P(s.sh,s.sg)}%</b></div><div class="stat">Daneben<b>${s.m}</b></div></div></div>`}
+function flash(msg){let el=document.getElementById("flash");if(!el)return;el.textContent="✓ "+msg;clearTimeout(window.__flash);window.__flash=setTimeout(()=>{if(el)el.textContent=""},1200)}
+function shot(r){let g=G(),k=K(g);k.normal.push(r);g.events.push({time:g.currentTimeSec,type:"shot",shotType:S.type,result:r,keeper:k.id});persist();render();flash(r=="held"?"Gehalten":r=="goal"?"Tor":"Daneben")}
+function seven(r){let g=G(),k=K(g);k.seven.push(r);g.events.push({time:g.currentTimeSec,type:"seven",result:r,keeper:k.id});persist();render();flash("7m: "+(r=="held"?"Gehalten":r=="goal"?"Tor":"Daneben"))}
+function own(r){let g=G(),k=K(g);k.own.push(r);g.events.push({time:g.currentTimeSec,type:"own",result:r,keeper:k.id});persist();render();flash(r=="goal"?"Tor": "Technischer Fehler")}
+function undo(){let g=G();if(!g.events?.length){flash("Nichts rückgängig");return}let e=g.events.pop(),k=g.keepers[e.keeper];if(e.type=="shot"){let i=k.normal.lastIndexOf(e.result);if(i>=0)k.normal.splice(i,1)}else if(e.type=="seven"){let i=k.seven.lastIndexOf(e.result);if(i>=0)k.seven.splice(i,1)}else if(e.type=="own"){let i=k.own.lastIndexOf(e.result);if(i>=0)k.own.splice(i,1)}persist();render();flash("Letzte Eingabe entfernt")}
+function pause(){let g=G(),k=K(g);if(g.paused){g.paused=false;k.segments.push({start:g.currentTimeSec,end:null});}else{g.paused=true;let z=k.segments.at(-1);if(z&&z.end==null)z.end=g.currentTimeSec;}persist();render()}
+function successToast(msg){let t=document.getElementById("toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";document.body.appendChild(t)}t.textContent="✓ "+msg;t.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove("show"),2000)}
+function openModal(x){document.getElementById("modal").innerHTML=`<div class="modal-body">${x}</div>`;document.getElementById("overlay").classList.remove("hidden")}function closeModal(){document.getElementById("overlay").classList.add("hidden")}
+function timeModal(){let g=G(),m=Math.floor(g.currentTimeSec/60),s=g.currentTimeSec%60;openModal(`<h2>Spielzeit ändern</h2><p>Die Zeit darf nicht zurückgehen. Maximal 60:00.</p><div class="grid2"><div><label>Minuten</label><select id="timeMin">${Array.from({length:61},(_,i)=>`<option value="${i}" ${i==m?"selected":""}>${String(i).padStart(2,"0")}</option>`).join("")}</select></div><div><label>Sekunden</label><select id="timeSec">${Array.from({length:60},(_,i)=>`<option value="${i}" ${i==s?"selected":""}>${String(i).padStart(2,"0")}</option>`).join("")}</select></div></div><div class="quick">${[0,600,1200,1800,2400,3000,3600].map(x=>`<button onclick="setQuickTime(${Math.floor(x/60)},${x%60})">${F(x)}</button>`).join("")}</div><div class="actions"><button class="btn secondary" onclick="closeModal()">Abbrechen</button><button class="btn" onclick="applyTime()">Übernehmen</button></div>`)}
+function setQuickTime(m,s){document.getElementById("timeMin").value=m;document.getElementById("timeSec").value=s}
+function applyTime(){let g=G(),mi=document.getElementById("timeMin"),se=document.getElementById("timeSec");if(!mi||!se)return;let t=Number(mi.value)*60+Number(se.value);if(!Number.isFinite(t)||t<0||t>3600)return alert("Bitte eine Spielzeit zwischen 00:00 und 60:00 wählen.");if(t<g.currentTimeSec)return alert("Die Spielzeit darf nicht zurückgesetzt werden.");let old=g.currentTimeSec,k=K(g);if(!g.paused&&t>old){let z=k.segments.at(-1);if(z&&z.end==null)z.end=t;k.segments.push({start:t,end:null});}g.currentTimeSec=t;persist();closeModal();render()}
+function keeperModal(){let g=G();openModal(`<h2>Torwartwechsel</h2><p>Aktuelle Spielzeit: <b>${F(g.currentTimeSec)}</b></p><label>Neuer Torwart</label><select id="newk">${Object.values(g.keepers).map(k=>`<option value="${k.id}" ${k.id==g.activeKeeperId?"selected":""}>${esc(k.name)}</option>`).join("")}</select><div class="actions"><button class="btn secondary" onclick="closeModal()">Abbrechen</button><button class="btn" onclick="switchK()">Wechsel speichern</button></div>`)}
+function switchK(){let g=G(),id=document.getElementById("newk").value;if(id==g.activeKeeperId)return closeModal();let oldK=K(g),z=oldK.segments.at(-1);if(z&&z.end==null)z.end=g.currentTimeSec;if(!g.paused)g.keepers[id].segments.push({start:g.currentTimeSec,end:null});g.activeKeeperId=id;persist();closeModal();render()}
+function finishModal(){let g=G();openModal(`<h2>🏁 Spiel beenden?</h2><p>Das Spiel wird mit dem aktuellen Stand gespeichert. <b>Danach kann es nicht mehr bearbeitet werden.</b></p><div class="card" style="background:var(--soft)"><b>${esc(g.opponent)}</b><br><span class="muted">${g.venue=="heim"?"Heim":"Auswärts"} · ${F(g.currentTimeSec)}</span></div><div class="actions"><button class="btn secondary" onclick="closeModal()">Abbrechen</button><button class="btn danger" onclick="finish()">Spiel endgültig speichern</button></div>`)}
+function finish(){
+  let g=G(),z=K(g).segments.at(-1);
+  if(z&&z.end==null)z.end=g.currentTimeSec;
+  g.club=g.club||localStorage.getItem("tqLastClub")||"Mein Verein";g.opponent=g.opponent||"Gegner";g.finishedAt=new Date().toISOString();
+  seaFor(g.season).games.push(g);
+  db.activeGame=null;
+  S.game=null;
+  S.screen="home";
+  save();
+  closeModal();
+  render();
+  successToast("Spiel erfolgreich gespeichert");
+}
+function seaFor(n){return db.seasons[n]||(db.seasons[n]={games:[]})}
+function past(){let a=sea().games||[];return`<div class="nav"><button class="btn secondary" onclick="S.screen='home';render()">← Start</button><button class="btn secondary" onclick="S.screen='season';render()">📊 Saison</button></div><div class="card"><h2>Vergangene Spiele</h2><p class="muted">${esc(S.season)}</p>${a.length?a.slice().reverse().map(g=>`<div class="item"><div class="section"><div><b>${matchTitle(g)}</b><br><span class="small muted">${esc(g.date||"")} · ${g.venue=="heim"?"Heim":"Auswärts"} · ${F(g.currentTimeSec)}</span></div></div><div class="actions"><button class="btn secondary" onclick="openSummary('${g.id}')">Öffnen</button><button class="btn danger" onclick="deleteModal('${g.id}')">🗑️ Löschen</button></div></div>`).join(""):`<div class="empty">Noch keine abgeschlossenen Spiele.</div>`}</div>`}
+function openSummary(id){let g=sea().games.find(x=>x.id==id);if(!g)return;let rows=Object.values(g.keepers).map(k=>{let s=st(k);return`<div class="item"><div class="section"><b>${esc(k.name)}</b><span class="pill">${F(PT(k))}</span></div><div class="statgrid"><div class="stat">Quote<b>${P(s.h,s.g)}%</b><span class="small">${s.h}/${s.h+s.g} gehalten</span></div><div class="stat">7m Quote<b>${P(s.sh,s.sg)}%</b><span class="small">${s.sh}/${s.sh+s.sg} gehalten</span></div><div class="stat">Tore<b>${s.g+s.sg}</b><span class="small">davon ${s.sg} 7m-Tore</span></div><div class="stat">Daneben<b>${s.m}</b></div><div class="stat">TW-Tore<b>${s.ownGoal||0}</b><span class="small">selbst erzielte Tore</span></div><div class="stat">Technische Fehler<b>${s.er}</b></div></div><div class="detail-title">Würfe nach Wurfart</div><div class="detail-list">${detailHtml(g,k)}</div></div>`}).join("");openModal(`<button class="modal-x" onclick="closeModal()" aria-label="Schließen">×</button><h2>${matchTitle(g)}</h2><p class="muted">${esc(g.date||"")} · ${g.venue=="heim"?"🏠 Heim":"✈️ Auswärts"} · ${F(g.currentTimeSec)}</p><div class="card"><div class="statgrid"><div class="stat">Spieltag<b>${esc(g.matchday||"—")}</b></div><div class="stat">Torhüter<b>${Object.keys(g.keepers).length}</b></div></div></div><h3>Torwart-Übersicht</h3>${rows}<button class="btn secondary" onclick="closeModal()">Schließen</button>`)}
+function deleteModal(id){let g=Object.values(db.seasons).flatMap(s=>s.games||[]).find(x=>x.id==id);if(!g)return;openModal(`<h2>🗑️ Spiel endgültig löschen?</h2><p>Du löschst das Spiel gegen <b>${esc(g.opponent)}</b> vom ${esc(g.date||"ohne Datum")}.</p><p><b>Dieser Vorgang kann nicht rückgängig gemacht werden.</b> Alle Statistiken und Ereignisse werden entfernt.</p><div class="actions"><button class="btn secondary" onclick="closeModal()">Abbrechen</button><button class="btn danger" onclick="del('${g.id}')">Unwiderruflich löschen</button></div>`)}
+function del(id){
+  let removed=false;
+  Object.values(db.seasons).forEach(s=>{
+    const before=(s.games||[]).length;
+    s.games=(s.games||[]).filter(g=>g.id!=id);
+    if(s.games.length<before)removed=true;
+  });
+  save();
+  closeModal();
+  S.game=null;
+  S.screen="past";
+  render();
+  if(removed)successToast("Spiel erfolgreich gelöscht");
+}
+function summary(g){let rows=Object.values(g.keepers).map(k=>{let s=st(k);return`<div class="item"><div class="section"><b>${esc(k.name)}</b><span class="pill">${F(PT(k))}</span></div><div class="statgrid"><div class="stat">Quote<b>${P(s.h,s.g)}%</b><span class="small">${s.h}/${s.h+s.g} gehalten</span></div><div class="stat">7m Quote<b>${P(s.sh,s.sg)}%</b><span class="small">${s.sh}/${s.sh+s.sg} gehalten</span></div><div class="stat">Tore<b>${s.g+s.sg}</b><span class="small">davon ${s.sg} 7m-Tore</span></div><div class="stat">Daneben<b>${s.m}</b></div><div class="stat">TW-Tore<b>${s.ownGoal||0}</b><span class="small">selbst erzielte Tore</span></div><div class="stat">Technische Fehler<b>${s.er}</b></div></div><div class="detail-title">Würfe nach Wurfart</div><div class="detail-list">${detailHtml(g,k)}</div></div>`}).join("");return`<div class="nav"><button class="btn secondary" onclick="S.screen='past';render()">← Spiele</button><button class="btn secondary" onclick="S.screen='home';render()">Start</button></div><div class="card"><h2>${matchTitle(g)}</h2><p class="muted">${esc(g.date||"")} · ${g.venue=="heim"?"🏠 Heim":"✈️ Auswärts"} · ${F(g.currentTimeSec)}</p></div><div class="card"><h3>Torwart-Statistik</h3>${rows}</div><div class="card"><button class="btn danger" onclick="deleteModal('${g.id}')">🗑️ Dieses Spiel löschen</button><p class="small muted">Abgeschlossene Spiele sind schreibgeschützt.</p></div>`}
+function aggregateSeason(games){
+  const z={h:0,g:0,m:0,sh:0,sg:0,sm:0,er:0,ownGoal:0,t:0};
+  games.forEach(g=>Object.values(g.keepers).forEach(k=>{
+    const s=st(k);z.h+=s.h;z.g+=s.g;z.m+=s.m;z.sh+=s.sh;z.sg+=s.sg;z.sm+=s.sm;z.er+=s.er;z.ownGoal+=(s.ownGoal||0);z.t+=PT(k);
+  }));
+  return z;
+}
+function seasonKeeperDetails(games){
+  const map={};
+  games.forEach(g=>Object.values(g.keepers).forEach(k=>{
+    const key=k.name;
+    if(!map[key])map[key]={name:k.name,h:0,g:0,m:0,sh:0,sg:0,er:0,ownGoal:0,t:0,types:{}};
+    const x=map[key],s=st(k);
+    x.h+=s.h;x.g+=s.g;x.m+=s.m;x.sh+=s.sh;x.sg+=s.sg;x.er+=s.er;x.ownGoal+=(s.ownGoal||0);x.t+=PT(k);
+    detailStats(g,k).forEach(r=>{
+      if(!x.types[r.label])x.types[r.label]={h:0,total:0};
+      x.types[r.label].h+=r.h;x.types[r.label].total+=r.total;
+    });
+  }));
+  return Object.values(map);
+}
+function seasonDetailHtml(games){
+  return seasonKeeperDetails(games).map(x=>`<div class="item"><div class="section"><b>${esc(x.name)}</b><span class="pill">${F(x.t)}</span></div><div class="statgrid"><div class="stat">Quote<b>${P(x.h,x.g)}%</b><span class="small">${x.h}/${x.h+x.g} gehalten</span></div><div class="stat">7m Quote<b>${P(x.sh,x.sg)}%</b><span class="small">${x.sh}/${x.sh+x.sg} gehalten</span></div><div class="stat">Tore<b>${x.g+x.sg}</b><span class="small">davon ${x.sg} 7m-Tore</span></div><div class="stat">Daneben<b>${x.m}</b></div><div class="stat">TW-Tore<b>${x.ownGoal||0}</b><span class="small">selbst erzielte Tore</span></div><div class="stat">Technische Fehler<b>${x.er}</b></div></div><div class="detail-title">Würfe nach Wurfart</div><div class="detail-list">${Object.entries(x.types).map(([label,r])=>`<div class="detail-row"><b>Gehaltene ${esc(label)}-Würfe</b><span>${r.h}/${r.total} gehalten</span></div>`).join("")}</div></div>`).join("");
+}
+function season(){
+  let a=sea().games||[],f=S.filters;
+  let op=[...new Set(a.map(g=>g.opponent).filter(Boolean))];
+  let ks=[...new Set(a.flatMap(g=>Object.values(g.keepers).map(k=>k.name)))];
+  let x=a.filter(g=>(f.v=="alle"||g.venue==f.v)&&(f.o=="alle"||g.opponent==f.o)&&(f.k=="alle"||Object.values(g.keepers).some(k=>k.name==f.k)));
+  let z=aggregateSeason(x);
+  return`<div class="nav"><button class="btn secondary" onclick="S.screen='home';render()">← Start</button><button class="btn secondary" onclick="S.screen='past';render()">📋 Spiele</button></div>
+  <div class="card"><h2>Saisonübersicht</h2><p class="muted">${esc(S.season)} · ${x.length} Spiele</p>
+  <div class="grid2">
+  <select onchange="S.filters.v=this.value;render()"><option value="alle">Heim & Auswärts</option><option value="heim" ${f.v=="heim"?"selected":""}>Nur Heim</option><option value="auswärts" ${f.v=="auswärts"?"selected":""}>Nur Auswärts</option></select>
+  <select onchange="S.filters.o=this.value;render()"><option value="alle">Alle Gegner</option>${op.map(v=>`<option value="${esc(v)}" ${f.o==v?"selected":""}>${esc(v)}</option>`).join("")}</select>
+  <select onchange="S.filters.k=this.value;render()"><option value="alle">Alle Torhüter</option>${ks.map(v=>`<option value="${esc(v)}" ${f.k==v?"selected":""}>${esc(v)}</option>`).join("")}</select>
+  <button class="btn secondary" onclick="S.filters={v:'alle',o:'alle',k:'alle'};render()">Filter zurücksetzen</button></div></div>
+  <div class="card"><h3>Gesamtstatistik</h3><div class="statgrid">
+  <div class="stat">Quote<b>${P(z.h,z.g)}%</b><span class="small">${z.h}/${z.h+z.g} gehalten</span></div>
+  <div class="stat">7m Quote<b>${P(z.sh,z.sg)}%</b><span class="small">${z.sh}/${z.sh+z.sg} gehalten</span></div>
+  <div class="stat">Tore<b>${z.g+z.sg}</b><span class="small">${z.g} normal · ${z.sg} 7m</span></div>
+  <div class="stat">Daneben<b>${z.m}</b></div>
+  <div class="stat">Technische Fehler<b>${z.er}</b></div><div class="stat">TW-Tore<b>${z.ownGoal}</b></div>
+  <div class="stat">Spielzeit<b>${F(z.t)}</b></div>
+  </div></div>
+  <div class="card"><h3>Detaillierte Torwart-Statistik</h3>${x.length?seasonDetailHtml(x):`<div class="empty">Keine Spiele für diese Filter vorhanden.</div>`}</div>`;
+}
+if(localStorage.getItem("tqDark")=="1")document.body.classList.add("dark");render();
+</script></body></html>
